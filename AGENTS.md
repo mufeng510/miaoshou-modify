@@ -5,6 +5,9 @@
 ## 项目约定
 
 - 只写油猴脚本，不做后端改动，不请求任何接口，不改任何服务器数据。
+- **每次改动本脚本后必须递增 `@version` 并 `git push origin main`**（Tampermonkey 通过
+  `@updateURL`/`@downloadURL` 从 GitHub raw 读取并自动更新；版本不升，用户拿不到更新）。
+  由 Agent 改脚本时自动执行，不要等用户提醒。脚本 `@name` 保持稳定，不要改名。
 - 生产环境页面（妙手 ERP）仅用于**只读**研究：不点击按钮、不提交表单、不做任何会改变数据的操作。
 - 研究页面 DOM 用 `browse` 扩展（OpenCode Browse）的 **read-only session**（`session_new { readOnly: true }`），
   且必须由用户手动「借出」标签页后才能读取；结束后用户会收回标签页。
@@ -19,3 +22,7 @@
   - `tr.order-header-tr > td[colspan=9]`（整行横幅）
   - `tr.order-body-tr`，9 个 `<td>` 与表头一一对应（打印状态为第 8 个，内容如「未打印」，无 class/data 属性）
 - 全选框列在「商品信息」表头内，不要动它
+- 订单整行右侧的「处理」下拉（.process-tag-text，位于
+  `div.d-flex.flex-1.justify-content-end.flex-gap-20 > .el-dropdown.pro-dropdown`）
+  原为靠右对齐，横向滚动时不可达；本脚本用 CSS 改为 `justify-content:flex-start`
+  （选择器：`.flex-1.justify-content-end:has(.process-tag-text)`，实测命中该页全部 6 行）

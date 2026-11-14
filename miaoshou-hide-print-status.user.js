@@ -1,10 +1,12 @@
 // ==UserScript==
 // @name         妙手订单 - 隐藏「打印状态」列
 // @namespace    miaoshou-modify
-// @version      1.0.0
-// @description  隐藏妙手订单表格中的「打印状态」列（表头 th[prop="printExpress"]），自动适配 Vue 动态重渲染
+// @version      1.1.0
+// @description  妙手订单：隐藏「打印状态」列；订单整行右侧的「处理」下拉改为靠左对齐（不再被横向滚动条挡住）
 // @author       dev-lead
 // @match        *://*.chengji-inc.com/*
+// @downloadURL  https://raw.githubusercontent.com/mufeng510/miaoshou-modify/main/miaoshou-hide-print-status.user.js
+// @updateURL    https://raw.githubusercontent.com/mufeng510/miaoshou-modify/main/miaoshou-hide-print-status.user.js
 // @run-at       document-idle
 // @grant        none
 // @license      MIT
@@ -22,8 +24,11 @@
  *      保证整行横幅仍撑满宽度。
  *   4. 页面是 Vue SPA，搜索/翻页/筛选会重建 tbody，用 MutationObserver
  *      + requestAnimationFrame 节流重新扫描，新增的行也会被隐藏。
+ *   5. 订单整行右侧的「处理」下拉（未处理/已处理）原本被
+ *      flex-1 + justify-content-end 顶到最右端，表格横向滚动时不可见。
+ *      用 CSS 覆盖为靠左对齐（见下方 :has() 选择器），纯样式、无 JS 介入。
  *
- * 只隐藏列、不改任何数据，不发起任何网络请求，不点击任何按钮。
+ * 只调样式、不改任何数据，不发起任何网络请求，不点击任何按钮。
  */
 (function () {
   'use strict';
@@ -33,7 +38,13 @@
   const COL_TEXT = '打印状态';
 
   const style = document.createElement('style');
-  style.textContent = `.${HIDE_CLASS} { display: none !important; }`;
+  style.textContent = `
+    .${HIDE_CLASS} { display: none !important; }
+    /* 订单整行里装「处理」下拉的右侧容器：靠最右 → 靠左 */
+    #J_afs-table tr.order-header-tr .flex-1.justify-content-end:has(.process-tag-text) {
+      justify-content: flex-start !important;
+    }
+  `;
   (document.head || document.documentElement).appendChild(style);
 
   const compact = (s) => (s || '').replace(/\s+/g, '');
