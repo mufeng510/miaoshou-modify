@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         妙手订单 - 隐藏「打印状态」列
 // @namespace    miaoshou-modify
-// @version      1.1.0
-// @description  妙手订单：隐藏「打印状态」列；订单整行右侧的「处理」下拉改为靠左对齐（不再被横向滚动条挡住）
+// @version      1.2.0
+// @description  妙手订单：隐藏「打印状态」列；订单整行「处理」下拉改为 position:sticky 贴可视区右缘，横向滚动也始终可点
 // @author       dev-lead
 // @match        *://*.chengji-inc.com/*
 // @downloadURL  https://raw.githubusercontent.com/mufeng510/miaoshou-modify/main/miaoshou-hide-print-status.user.js
@@ -24,9 +24,10 @@
  *      保证整行横幅仍撑满宽度。
  *   4. 页面是 Vue SPA，搜索/翻页/筛选会重建 tbody，用 MutationObserver
  *      + requestAnimationFrame 节流重新扫描，新增的行也会被隐藏。
- *   5. 订单整行右侧的「处理」下拉（未处理/已处理）原本被
- *      flex-1 + justify-content-end 顶到最右端，表格横向滚动时不可见。
- *      用 CSS 覆盖为靠左对齐（见下方 :has() 选择器），纯样式、无 JS 介入。
+ *   5. 订单整行右侧的「处理」下拉（未处理/已处理）原靠右对齐，表格出现横向
+ *      滚动时会不可见。现改为 position:sticky 贴可视区右缘（参考页面「操作」
+ *      固定列的实现：sticky + right:0 + z-index:1 + 不透明背景），无论滚动到
+ *      何处都始终可见、可点；背景色 rgb(220,239,255) 贴合订单整行的浅蓝底色。
  *
  * 只调样式、不改任何数据，不发起任何网络请求，不点击任何按钮。
  */
@@ -40,9 +41,12 @@
   const style = document.createElement('style');
   style.textContent = `
     .${HIDE_CLASS} { display: none !important; }
-    /* 订单整行里装「处理」下拉的右侧容器：靠最右 → 靠左 */
-    #J_afs-table tr.order-header-tr .flex-1.justify-content-end:has(.process-tag-text) {
-      justify-content: flex-start !important;
+    /* 订单整行「处理」下拉：贴可视区右缘，滚动时始终可见可点 */
+    #J_afs-table tr.order-header-tr .flex-1.justify-content-end > .el-dropdown.pro-dropdown {
+      position: sticky;
+      right: 0;
+      z-index: 1;
+      background: rgb(220, 239, 255); /* 贴合订单整行浅蓝底色 rgb(220,239,255) */
     }
   `;
   (document.head || document.documentElement).appendChild(style);

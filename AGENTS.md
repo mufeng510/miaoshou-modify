@@ -22,7 +22,9 @@
   - `tr.order-header-tr > td[colspan=9]`（整行横幅）
   - `tr.order-body-tr`，9 个 `<td>` 与表头一一对应（打印状态为第 8 个，内容如「未打印」，无 class/data 属性）
 - 全选框列在「商品信息」表头内，不要动它
-- 订单整行右侧的「处理」下拉（.process-tag-text，位于
+- 订单整行「处理」下拉（.process-tag-text，位于
   `div.d-flex.flex-1.justify-content-end.flex-gap-20 > .el-dropdown.pro-dropdown`）
-  原为靠右对齐，横向滚动时不可达；本脚本用 CSS 改为 `justify-content:flex-start`
-  （选择器：`.flex-1.justify-content-end:has(.process-tag-text)`，实测命中该页全部 6 行）
+  原为靠右对齐且随滚动不可达；本脚本使其 `position:sticky; right:0` 贴可视区右缘，
+  z-index:1、背景 rgb(220,239,255)（订单整行底色实测值），与「操作」固定列（sticky+right:0+不透明背景）同款
+- 实测页面细节：`.order-header-tr` 背景 rgb(220,239,255)；`#J_afs-table` 为 overflow:auto 滚动容器；
+  固定列背景：表头 TH rgb(245,247,250)、表体 TD rgb(255,255,255)（本页固定列无 class，class 为空）
